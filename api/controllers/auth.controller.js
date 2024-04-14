@@ -1,11 +1,19 @@
 import User from "../models/user.model.js";
 import becryptjs from "bcryptjs";
+import { errorHandler } from "../utils/error.js";
 
-export const signup = async (req, res) => {
+export const signup = async (req, res, next) => {
   const { username, email, password } = req.body;
 
-  if (!username || !email || !password)
-    return res.status(400).json({ message: "Bad Request", success: false });
+  if (
+    !username ||
+    username == "" ||
+    !email ||
+    email == "" ||
+    !password ||
+    password == ""
+  )
+    next(errorHandler(400, "All feilds are required"));
 
   const hashedPassword = becryptjs.hashSync(password, 10);
 
@@ -21,9 +29,6 @@ export const signup = async (req, res) => {
       .status(201)
       .json({ message: "Signup successful", success: true });
   } catch (err) {
-    console.log(`Error while creating user :: ${err}`);
-    return res
-      .status(201)
-      .json({ message: "Internal Server Error", success: false, data: err });
+    next(err);
   }
 };
