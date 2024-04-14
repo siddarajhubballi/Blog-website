@@ -23,6 +23,8 @@ export const signup = async (req, res, next) => {
     password: hashedPassword,
   });
 
+  console.log(newUser);
+
   try {
     await newUser.save();
     return res
