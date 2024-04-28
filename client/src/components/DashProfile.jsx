@@ -119,7 +119,7 @@ export default function DashProfile() {
                 <div className="relative w-32 h-32 self-center cursor-pointer shadow-md overflow-hidden rounded-full"
                     onClick={() => filePickerRef.current.click()}
                 >
-                    {imageFileUploadingProgress && (
+                    {imageFileUploadingProgress && imageFileUploadingProgress < 100 && (
                         <CircularProgressbar 
                             value={imageFileUploadingProgress || 0} 
                             text={`${imageFileUploadingProgress}%`} 
