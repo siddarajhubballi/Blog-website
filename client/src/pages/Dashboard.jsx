@@ -23,7 +23,7 @@ export default function Dashboard() {
         {/* Sidebar */}
         <DashSidebar />
       </div>
-      <div>
+      <div className="mx-auto w-full">
         {/* Main */}
         {tab === "profile" && <DashProfile />}
       </div>
