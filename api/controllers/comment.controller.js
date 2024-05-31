@@ -28,3 +28,18 @@ export const create = async (req,res,next) => {
     }
 
 }
+
+export const getPostComments = async (req, res, next) => {
+    if(!req.params.postId) {
+        next(errorHandler(400, "Unable to get post"));
+    }
+
+    try {
+        const comments = await Comment.find({postId: req.params.postId}).sort({createdAt: -1});
+
+        return res.status(200).json(comments);
+    }
+    catch(error) {
+        next(error);
+    }
+}  

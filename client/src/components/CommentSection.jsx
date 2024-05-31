@@ -2,12 +2,14 @@ import { Textarea, Button, Alert } from 'flowbite-react';
 import React from 'react';
 import {useSelector} from "react-redux";
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Comment from "../components/Comment";
 
 export default function CommentSection({postId}) {
     const {currentUser} = useSelector((state) => state.user);
     const [comment, setComment] = useState("");
     const [commentError, setCommentError] = useState(null);
+    const [postComments, setPostComments] = useState([]);
 
     const handleSubmit = async (e) => {
 
@@ -28,11 +30,10 @@ export default function CommentSection({postId}) {
     
             const data = await res.json();
 
-            console.log(data)
-
             if(res.ok) {
                 setCommentError(null);
                 setComment("");
+                setPostComments([data, ...postComments]);
             }
             else {
                 setCommentError(data.message);
@@ -45,7 +46,26 @@ export default function CommentSection({postId}) {
         }
 
     }
+
+    const getPostComments = async () => {
+        try {
+            const res = await fetch(`/api/comment/getPostComments/${postId}`);
+
+            const data = await res.json();
+
+            if(res.ok) {
+                setPostComments(data);
+            }
+        }
+        catch(error) {
+            console.log(error);
+        }
+    }
     
+    useEffect(() => {
+        getPostComments();
+    },[postId])
+
     return (
         <div className="mx-w-2xl mx-auto w-full p-3">
             {currentUser ? 
@@ -74,6 +94,7 @@ export default function CommentSection({postId}) {
                             rows={3}
                             maxLength={200}
                             onChange={((e) => setComment(e.target.value))}
+                            value={comment}
                         />
                         <div className="flex justify-between items-center mt-5">
                             <p className="text-gray-500 text-sm">{200 - comment.length} characters remaining</p>
@@ -89,7 +110,26 @@ export default function CommentSection({postId}) {
                     )}
                 </>
             )}
-                
+            {postComments.length === 0 
+            ? <>
+                <p classNaeme="text-sm my-5">No comments yet!</p>
+            </>
+            : 
+            <>
+                <div className="text-sm flex my-5 items-center gap-1">
+                    <p>Comments</p>
+                    <div className="border border-gray-400 py-1 px-2 rounded-sm">
+                        <p>{postComments.length}</p>
+                    </div>
+                </div>
+                {postComments?.map((comment, index) => 
+                    (<Comment 
+                        key={comment._id}
+                        comment={comment}
+                    />)
+                )}
+            </>
+            }  
         </div>
     )
 }
